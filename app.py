@@ -1,49 +1,54 @@
-from flask import Flask, render_template, request, jsonify
-import subprocess
+from flask import Flask, request, jsonify, send_from_directory
+from scapy.all import IP, UDP, send
+import threading
+import os
 
 app = Flask(__name__)
+threads = []
+running = False
 
-# Track the running process
-global traffic_process
-traffic_process = None
+def send_traffic(target_ip, size_in_bytes):
+    global running
+    packet = IP(dst=target_ip) / UDP(dport=12345) / (b'X' * 1024)  # Pacote UDP com payload de 1KB
+    packets_to_send = size_in_bytes // 1024  # Quantidade de pacotes a enviar
+
+    for _ in range(packets_to_send):
+        if not running:
+            break
+        send(packet, verbose=False)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory(os.path.dirname(__file__), 'index.html')
 
-@app.route('/start_traffic', methods=['POST'])
+@app.route('/start', methods=['POST'])
 def start_traffic():
-    global traffic_process
-    
-    # Get the IP and traffic speed
-    target_ip = request.json.get('ip')
-    traffic_speed = request.json.get('speed')
+    global running, threads
+    if running:
+        return jsonify({'message': 'Teste já está em execução!'}), 400
 
-    if not target_ip or not traffic_speed:
-        return jsonify({"error": "IP and speed are required"}), 400
+    data = request.json
+    target_ip = data.get('ip')
+    size = data.get('size')  # Tamanho em bytes
 
-    # Command to simulate traffic (example with 'iperf')
-    command = [
-        'iperf3', '-c', target_ip, '--bitrate', traffic_speed
-    ]
+    if not target_ip or not size:
+        return jsonify({'message': 'Parâmetros inválidos!'}), 400
 
-    try:
-        # Start the process
-        traffic_process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return jsonify({"message": "Traffic generation started"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    running = True
+    thread = threading.Thread(target=send_traffic, args=(target_ip, size))
+    threads.append(thread)
+    thread.start()
 
-@app.route('/stop_traffic', methods=['POST'])
+    return jsonify({'message': 'Tráfego iniciado!'})
+
+@app.route('/stop', methods=['POST'])
 def stop_traffic():
-    global traffic_process
-
-    if traffic_process:
-        traffic_process.terminate()
-        traffic_process = None
-        return jsonify({"message": "Traffic generation stopped"})
-
-    return jsonify({"error": "No traffic generation process running"}), 400
+    global running, threads
+    running = False
+    for thread in threads:
+        thread.join()
+    threads.clear()
+    return jsonify({'message': 'Teste encerrado!'})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5000)
