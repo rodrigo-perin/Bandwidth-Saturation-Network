@@ -8,13 +8,19 @@ running = False  # Flag para controlar o envio de tráfego
 
 def send_traffic(target_ip, size_in_bytes):
     global running
-    packet = IP(dst=target_ip) / UDP(dport=5001) / (b'X' * 1460)  # Pacote UDP com payload de 1460 bytes
+    packet = IP(dst=target_ip) / UDP(dport=5001) / (b'X' * 1460)  # Payload com 1460 bytes
     packets_to_send = size_in_bytes // 1460  # Quantidade de pacotes a enviar
 
+    print(f"Enviando {packets_to_send} pacotes para {target_ip}, tamanho total: {size_in_bytes} bytes.")
+
+    sent_packets = 0
     for _ in range(packets_to_send):
         if not running:
             break
         send(packet, verbose=False)
+        sent_packets += 1
+
+    print(f"Total de pacotes enviados: {sent_packets}")
 
 @app.route('/')
 def index():
