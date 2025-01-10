@@ -46,13 +46,13 @@
     </script>
 </head>
 <body>
-    <h1>Throughput-Test-Conectiva v1.8</h1>
+    <h1>Throughput-Test-Conectiva v1.9</h1>
     <label for="target-ip">IP de Destino:</label>
     <input type="text" id="target-ip" placeholder="Digite o IP de destino">
     <br><br>
-    <button onclick="startTraffic(100 * 1024 * 1024)">Enviar 100 Mega</button>
-    <button onclick="startTraffic(500 * 1024 * 1024)">Enviar 500 Mega</button>
-    <button onclick="startTraffic(1024 * 1024 * 1024)">Enviar 1 Giga</button>
+    <button onclick="startTraffic(104857600)">Enviar 100 Mega</button>
+    <button onclick="startTraffic(524288000)">Enviar 500 Mega</button>
+    <button onclick="startTraffic(1073741824)">Enviar 1 Giga</button>
     <br><br>
     <button onclick="stopTraffic()">Encerrar Teste</button>
 </body>
