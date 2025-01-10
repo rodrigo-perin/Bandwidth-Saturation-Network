@@ -1,46 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste de Tráfego UDP</title>
-  <script>
-    async function sendTraffic(size) {
-      const ip = document.getElementById('target-ip').value;
-      if (!ip) {
-        alert('Por favor, insira um IP de destino.');
-        return;
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throughput-Test-Conectiva</title>
+    <script>
+        async function startTraffic(size) {
+            const targetIp = document.getElementById('target-ip').value;
+            if (!targetIp) {
+                alert('Por favor, insira o IP de destino.');
+                return;
+            }
 
-      const response = await fetch('/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ip, size })
-      });
+            try {
+                const response = await fetch('/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        target_ip: targetIp,
+                        size: size
+                    })
+                });
+                const result = await response.json();
+                alert(result.message || 'Erro ao iniciar tráfego');
+            } catch (error) {
+                alert('Erro ao comunicar com o servidor.');
+                console.error(error);
+            }
+        }
 
-      const result = await response.json();
-      alert(result.message);
-    }
-
-    async function stopTraffic() {
-      const response = await fetch('/stop', {
-        method: 'POST'
-      });
-
-      const result = await response.json();
-      alert(result.message);
-    }
-  </script>
+        async function stopTraffic() {
+            try {
+                const response = await fetch('/stop', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                alert(result.message || 'Erro ao encerrar tráfego');
+            } catch (error) {
+                alert('Erro ao comunicar com o servidor.');
+                console.error(error);
+            }
+        }
+    </script>
 </head>
 <body>
-  <h1>Teste de Tráfego UDP</h1>
-  <label for="target-ip">IP de destino:</label>
-  <input type="text" id="target-ip" placeholder="192.168.1.1">
-  <br><br>
-  <button onclick="sendTraffic(100 * 1024 * 1024)">Enviar 100 Mega</button>
-  <button onclick="sendTraffic(500 * 1024 * 1024)">Enviar 500 Mega</button>
-  <button onclick="sendTraffic(1 * 1024 * 1024 * 1024)">Enviar 1 Giga</button>
-  <br><br>
-  <button onclick="stopTraffic()">Encerrar teste</button>
+    <h1>Throughput-Test-Conectiva v1.8</h1>
+    <label for="target-ip">IP de Destino:</label>
+    <input type="text" id="target-ip" placeholder="Digite o IP de destino">
+    <br><br>
+    <button onclick="startTraffic(100 * 1024 * 1024)">Enviar 100 Mega</button>
+    <button onclick="startTraffic(500 * 1024 * 1024)">Enviar 500 Mega</button>
+    <button onclick="startTraffic(1024 * 1024 * 1024)">Enviar 1 Giga</button>
+    <br><br>
+    <button onclick="stopTraffic()">Encerrar Teste</button>
 </body>
 </html>
