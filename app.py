@@ -1,50 +1,54 @@
 from flask import Flask, request, jsonify, render_template
-from threading import Thread
-from scapy.all import IP, UDP, send
+from scapy.all import IP, UDP, sendpfast
+import threading
 
 app = Flask(__name__)
 
-running = False  # Flag para controlar o envio de tráfego
+running = False  # Variável global para controlar o envio de tráfego
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 def send_traffic(target_ip, size_in_bytes):
     global running
-    packet = IP(dst=target_ip) / UDP(dport=5001) / (b'X' * 1460)  # Payload com 1460 bytes
-    packets_to_send = size_in_bytes // 1460  # Quantidade de pacotes a enviar
+    packet = IP(dst=target_ip) / UDP(dport=12345) / (b'X' * 1024)  # Pacote UDP com 1KB
+    packets_to_send = size_in_bytes // 1024  # Total de pacotes a serem enviados
 
-    print(f"Enviando {packets_to_send} pacotes para {target_ip}, tamanho total: {size_in_bytes} bytes.")
+    if running:
+        print(f"Enviando {packets_to_send} pacotes para {target_ip}, tamanho total: {size_in_bytes} bytes.")
+        try:
+            sendpfast(packet, loop=packets_to_send, iface="enp0s18", verbose=False)  # Substitua pela interface correta
+            print("Envio concluído.")
+        except Exception as e:
+            print(f"Erro ao enviar pacotes: {e}")
 
-    sent_packets = 0
-    for _ in range(packets_to_send):
-        if not running:
-            break
-        send(packet, verbose=False)
-        sent_packets += 1
-
-    print(f"Total de pacotes enviados: {sent_packets}")
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/start', methods=['POST'])
+@app.route("/start", methods=["POST"])
 def start_traffic():
     global running
-    data = request.get_json()
-    target_ip = data.get('target_ip')
-    size_in_bytes = data.get('size')
-    
-    if not target_ip or not size_in_bytes:
-        return jsonify({"error": "Parâmetros inválidos"}), 400
+    if running:
+        return jsonify({"status": "Já em execução"})
 
     running = True
-    Thread(target=send_traffic, args=(target_ip, size_in_bytes)).start()
-    return jsonify({"message": f"Iniciando tráfego para {target_ip} de {size_in_bytes} bytes"})
+    data = request.get_json()
+    target_ip = data.get("target_ip")
+    size_in_mb = data.get("size_in_mb")
 
-@app.route('/stop', methods=['POST'])
+    if not target_ip or not size_in_mb:
+        return jsonify({"error": "Parâmetros inválidos"}), 400
+
+    size_in_bytes = size_in_mb * 1024 * 1024
+
+    thread = threading.Thread(target=send_traffic, args=(target_ip, size_in_bytes))
+    thread.start()
+
+    return jsonify({"status": "Envio iniciado"})
+
+@app.route("/stop", methods=["POST"])
 def stop_traffic():
     global running
     running = False
-    return jsonify({"message": "Tráfego encerrado"})
+    return jsonify({"status": "Envio interrompido"})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
