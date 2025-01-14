@@ -11,7 +11,7 @@
                 alert('Por favor, insira o IP de destino.');
                 return;
             }
-
+    
             try {
                 const response = await fetch('/start', {
                     method: 'POST',
@@ -20,7 +20,7 @@
                     },
                     body: JSON.stringify({
                         target_ip: targetIp,
-                        size: size
+                        size_in_mb: size 
                     })
                 });
                 const result = await response.json();
@@ -30,7 +30,7 @@
                 console.error(error);
             }
         }
-
+    
         async function stopTraffic() {
             try {
                 const response = await fetch('/stop', {
@@ -44,9 +44,10 @@
             }
         }
     </script>
+    
 </head>
 <body>
-    <h1>Throughput-Test-Conectiva v1.13</h1>
+    <h1>Throughput-Test-Conectiva v1.15</h1>
     <label for="target-ip">IP de Destino:</label>
     <input type="text" id="target-ip" placeholder="Digite o IP de destino">
     <br><br>

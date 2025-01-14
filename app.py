@@ -18,7 +18,7 @@ def send_traffic(target_ip, size_in_bytes):
     if running:
         print(f"Enviando {packets_to_send} pacotes para {target_ip}, tamanho total: {size_in_bytes} bytes.")
         try:
-            sendpfast(packet, loop=packets_to_send, iface="ens18", verbose=False)  # Substitua pela interface correta
+            sendpfast(packet, loop=packets_to_send, iface="ens18", verbose=False)  # Substitua "ens18" pela interface correta
             print("Envio concluído.")
         except Exception as e:
             print(f"Erro ao enviar pacotes: {e}")
@@ -36,12 +36,12 @@ def start_traffic():
     # Log para depuração
     print(f"Dados recebidos na requisição: {data}")
 
-    target_ip = data.get("target_ip")
-    size_in_mb = data.get("size_in_mb")
-
-    if not target_ip or not size_in_mb:
-        print("Erro: Parâmetros inválidos recebidos.")
-        print(f"target_ip: {target_ip}, size_in_mb: {size_in_mb}")
+    try:
+        target_ip = data["target_ip"]
+        size_in_mb = int(data["size_in_mb"])
+    except (KeyError, TypeError, ValueError) as e:
+        print(f"Erro: Parâmetros inválidos recebidos. Detalhes: {e}")
+        print(f"target_ip: {data.get('target_ip')}, size_in_mb: {data.get('size_in_mb')}")
         return jsonify({"error": "Parâmetros inválidos"}), 400
 
     size_in_bytes = size_in_mb * 1024 * 1024
