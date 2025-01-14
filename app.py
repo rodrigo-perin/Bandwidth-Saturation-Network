@@ -18,7 +18,8 @@ def send_traffic(target_ip, size_in_bytes):
     if running:
         print(f"Enviando {packets_to_send} pacotes para {target_ip}, tamanho total: {size_in_bytes} bytes.")
         try:
-            sendpfast(packet, loop=packets_to_send, iface="ens18", verbose=False)  # Substitua "ens18" pela interface correta
+            # O argumento 'verbose' foi removido
+            sendpfast(packet, loop=packets_to_send, iface="ens18")  # Substitua "ens18" pela interface correta
             print("Envio concluído.")
         except Exception as e:
             print(f"Erro ao enviar pacotes: {e}")
