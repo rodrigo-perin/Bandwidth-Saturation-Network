@@ -3,7 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Throughput-Test-Conectiva</title>
+    <title>Bandwidth-Saturation-Network</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+            text-align: center;
+            width: 300px;
+        }
+
+        label {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background-color: #38a169;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2f855a;
+        }
+
+        button:active {
+            background-color: #276749;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
     <script>
         async function startTraffic(size) {
             const targetIp = document.getElementById('target-ip').value;
@@ -44,17 +115,18 @@
             }
         }
     </script>
-    
 </head>
 <body>
-    <h1>Throughput-Test-Conectiva v1.19</h1>
-    <label for="target-ip">IP de Destino:</label>
-    <input type="text" id="target-ip" placeholder="Digite o IP de destino">
-    <br><br>
-    <button onclick="startTraffic(104857600)">Enviar 100 Mega</button>
-    <button onclick="startTraffic(524288000)">Enviar 500 Mega</button>
-    <button onclick="startTraffic(1073741824)">Enviar 1 Giga</button>
-    <br><br>
-    <button onclick="stopTraffic()">Encerrar Teste</button>
+    <div class="container">
+        <h1>Bandwidth-Saturation-Network v1.19</h1>
+        <input type="text" id="target-ip" placeholder="Digite o IP de destino">
+        <button onclick="startTraffic(104857600)">Enviar 100 Mega</button>
+        <button onclick="startTraffic(524288000)">Enviar 500 Mega</button>
+        <button onclick="startTraffic(1073741824)">Enviar 1 Giga</button>
+        <br /><br />
+        <button onclick="stopTraffic()">### Encerrar Teste ###</button>
+        <br /><br /><br />
+        <center>versão 1.19</center>
+    </div>
 </body>
 </html>
