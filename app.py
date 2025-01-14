@@ -12,14 +12,13 @@ def index():
 
 def send_traffic(target_ip, size_in_bytes):
     global running
-    packet = IP(dst=target_ip) / UDP(dport=12345) / (b'X' * 1024)  # Pacote UDP com 1KB
-    packets_to_send = size_in_bytes // 1024  # Total de pacotes a serem enviados
+    packet = Ether() / IP(dst=target_ip) / UDP(dport=12345) / (b'X' * 1024)  # Adiciona cabeçalho Ethernet
+    packets_to_send = size_in_bytes // 1024  # Total de pacotes a enviar
 
     if running:
         print(f"Enviando {packets_to_send} pacotes para {target_ip}, tamanho total: {size_in_bytes} bytes.")
         try:
-            # O argumento 'verbose' foi removido
-            sendpfast(packet, loop=packets_to_send, iface="ens18")  # Substitua "ens18" pela interface correta
+            sendpfast(packet, loop=packets_to_send, iface="ens18", verbose=False)
             print("Envio concluído.")
         except Exception as e:
             print(f"Erro ao enviar pacotes: {e}")
