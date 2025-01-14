@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from scapy.all import IP, UDP, sendpfast
+from scapy.all import Ether, IP, UDP, sendpfast
 import threading
 
 app = Flask(__name__)
