@@ -31,6 +31,7 @@ def start_traffic():
 
     running = True
     data = request.get_json()
+    print(f"Dados recebidos na requisição: {data}")# Log para depuração
     target_ip = data.get("target_ip")
     size_in_mb = data.get("size_in_mb")
 
